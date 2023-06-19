@@ -1,0 +1,21 @@
+---
+- name: Install Jenkins
+  hosts: jenkins
+  become: true
+  tags: jenkins
+  roles:
+    - jenkins_install
+
+- name: Install Kubernetes
+  hosts: kubernetes
+  become: true
+  tags: kubernetes
+  roles:
+    - kubernetes_install
+
+- name: Install Docker
+  hosts: server
+  become: true
+  tags: server
+  roles:
+    - kubernetes_install

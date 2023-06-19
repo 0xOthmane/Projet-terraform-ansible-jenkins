@@ -1,0 +1,41 @@
+pipeline {
+    agent any
+
+    stages {
+        stage ("Install") {        
+            steps {
+                sh 'npm cache clean --force '
+                sh 'npm install --loglevel=verbose'
+            }
+        }
+        stage ("Test") {
+            steps {
+                sh 'npm test'
+            }
+        }
+        stage ("Docker Build") {
+            agent any
+            steps {
+                sh 'docker build -t othbel/todo-list-app .'
+            }
+        }
+        stage ("Docker Push") {
+            agent any
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'Docker Hub Creds', passwordVariable: 'passwordHub', usernameVariable: 'userHub')]) {
+                    sh "docker login -u ${env.userHub} -p ${env.passwordHub}"
+                    sh "docker push othbel/todo-list-app:latest"
+                }
+            }
+        }
+        stage ("Deploy on Minikube") {
+            agent any
+            
+            steps {
+                withCredentials([string(credentialsId: 'kubeconfig', variable: 'kubeconfig')]) {
+                    sh "kubectl --kubeconfig ${env.kubeconfig} apply -f charts/."
+                }    
+            }
+        }
+    }
+}

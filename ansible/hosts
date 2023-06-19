@@ -1,0 +1,9 @@
+[jenkins]
+# jenkins01 ansible_ssh_host=192.168.86.146 ansible_user=jenkins01
+master-jenkins ansible_ssh_host=192.168.86.155 ansible_user=master 
+
+[server]
+web-server ansible_ssh_host=192.168.86.156 ansible_user=server 
+
+[kubernetes]
+kube01 ansible_ssh_host=192.168.86.149 ansible_user=kube01

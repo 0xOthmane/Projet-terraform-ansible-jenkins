@@ -1,0 +1,35 @@
+---
+- name: Install Dependencies
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - curl
+      - gnupg
+    update_cache: true
+- name: Install Docker
+  ansible.builtin.script: /home/vm1/Documents/todolist-project/ansible/get-docker.sh
+- name: Start and enable Docker Service
+  ansible.builtin.service:
+    name: "docker"
+    state: restarted
+    enabled: true
+- name: Add user to Docker group
+  ansible.builtin.user:
+    name: "server"
+    groups: "docker"
+    append: true
+
+- name: Download Minikube RPM Package
+  ansible.builtin.get_url:
+    url: "https://storage.googleapis.com/minikube/releases/latest/minikube-latest.x86_64.rpm"
+    dest: "/tmp/minikube-latest.x86_64.rpm"
+    mode: "0755"
+- name: Install Minikube package
+  ansible.builtin.yum:
+    name: "/tmp/minikube-latest.x86_64.rpm"
+    state: present
+- name: Start Minikube
+  become_user: "kube01"
+  ansible.builtin.command:
+    cmd: "minikube start"
+    creates: nothing
